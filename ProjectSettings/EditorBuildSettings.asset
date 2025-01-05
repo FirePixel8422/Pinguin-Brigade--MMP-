@@ -4,5 +4,17 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/ConnectToLobby.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Main Scene.unity
+    guid: 2fdb4dc62f1f5d2408312522ab52db24
+  - enabled: 1
+    path: Assets/Scenes/FirePixel.unity
+    guid: de09152590585f042b1dbc2544bb62f4
+  - enabled: 1
+    path: Assets/Scenes/UseFulTime.unity
+    guid: 57e2e5d001f02bb4da71a0d3c479dd22
   m_configObjects: {}
