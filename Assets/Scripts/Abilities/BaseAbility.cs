@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public abstract class BaseAbility
 {
     public string Id { get; protected set; }

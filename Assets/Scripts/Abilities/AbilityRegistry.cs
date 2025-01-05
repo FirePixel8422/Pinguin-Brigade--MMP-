@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 public static class AbilityRegistry
 {
     private static Dictionary<string, BaseAbility> registeredAbilities = new Dictionary<string, BaseAbility>();
