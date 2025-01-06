@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 [System.Serializable]
-public struct CharacterStats
+public class CharacterStats
 {
     [SerializeField] private float baseMoveSpeed;
     [SerializeField] private float moveSpeedMultiplier;
