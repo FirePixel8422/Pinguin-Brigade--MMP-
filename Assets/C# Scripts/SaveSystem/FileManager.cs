@@ -90,16 +90,16 @@ public static class FileManager
 
 
     // Save method using JSON serialization
-    public async static Task SaveInfo<T>(T saveData, string directoryPlusFileNamePlusExtension, bool encryptFile = true) where T : struct
+    public async static Task SaveInfo<T>(T saveData, string pathPlusFileName, bool encryptFile = true) where T : struct
     {
         try
         {
-            directoryPlusFileNamePlusExtension = EnsurePersistentDataPath(directoryPlusFileNamePlusExtension);
+            pathPlusFileName = EnsurePersistentDataPath(pathPlusFileName);
 
             // Separate the directory path and the file name from the provided directoryPlusFileName string
-            string directoryPath = Path.GetDirectoryName(directoryPlusFileNamePlusExtension);
+            string directoryPath = Path.GetDirectoryName(pathPlusFileName);
 
-            string fileName = Path.GetFileName(directoryPlusFileNamePlusExtension);
+            string fileName = Path.GetFileName(pathPlusFileName);
 
 
             fileName = EnsureFileExtension(fileName);
@@ -207,7 +207,7 @@ public static class FileManager
 
 
 
-    public static string EnsurePersistentDataPath(string path)
+    private static string EnsurePersistentDataPath(string path)
     {
         //if path doesnt start with "Application.persistentDataPath", add it, because all files are preferably located in a fixed path
         if (path.StartsWith(Application.persistentDataPath) == false)
@@ -220,7 +220,7 @@ public static class FileManager
         }
     }
 
-    public static string EnsureFileExtension(string path)
+    private static string EnsureFileExtension(string path)
     {
         // if the "directoryPlusFileName" string doesnt have an extension (.json, .txt, etc) add .json automatically
         if (string.IsNullOrEmpty(Path.GetExtension(path)))
@@ -231,5 +231,17 @@ public static class FileManager
         {
             return path;
         }
+    }
+}
+
+
+public struct ValueWrapper<T> where T : struct
+{
+    public T value;
+
+
+    public ValueWrapper(T _value)
+    {
+        value = _value;
     }
 }

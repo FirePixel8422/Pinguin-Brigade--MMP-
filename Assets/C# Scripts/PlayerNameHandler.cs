@@ -27,7 +27,7 @@ public class PlayerNameHandler : MonoBehaviour
 
     public async void LoadPlayerName()
     {
-        (bool loadSucces, FixedString32Bytes name) = await FileManager.LoadInfo<FixedString32Bytes>("PlayerName.json");
+        (bool loadSucces, FixedString32Bytes name) = await FileManager.LoadInfo<FixedString32Bytes>("PlayerName");
 
         if (loadSucces)
         {
