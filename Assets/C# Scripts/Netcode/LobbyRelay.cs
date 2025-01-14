@@ -42,6 +42,8 @@ public class LobbyRelay : NetworkBehaviour
 
     public string _lobbyId;
 
+    private string localPlayerId;
+
     private RelayHostData _hostData;
     private RelayJoinData _joinData;
 
@@ -68,7 +70,6 @@ public class LobbyRelay : NetworkBehaviour
         {
             AuthenticationService.Instance.SignOut(true);
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            
         }
         catch (Exception ex)
         {
@@ -90,6 +91,8 @@ public class LobbyRelay : NetworkBehaviour
             yield return new WaitForSeconds(lobbySearchInterval);
         }
     }
+
+
     public async void FindLobbies()
     {
         try
@@ -110,6 +113,7 @@ public class LobbyRelay : NetworkBehaviour
                         new QueryOrder(false, QueryOrder.FieldOptions.Created),
                     }
             };
+
             if (searchedlobbyNameField != null && !string.IsNullOrEmpty(searchedlobbyNameField.text))   //FIX THIS, REMOVE !=null!!!
             {
                 queryOptions.Filters.Add(new QueryFilter(
@@ -136,6 +140,7 @@ public class LobbyRelay : NetworkBehaviour
         {
             Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyId);
 
+            localPlayerId = lobby.Players[^1].Id;
 
             string joinCode = lobby.Data["joinCode"].Value;
             JoinAllocation allocation = await Relay.Instance.JoinAllocationAsync(joinCode);
@@ -172,11 +177,7 @@ public class LobbyRelay : NetworkBehaviour
 
     public async void CreateLobby()
     {
-        int maxPlayers = 4;
-        if (!string.IsNullOrEmpty(maxPlayersField.text))
-        {
-            maxPlayers = Mathf.Clamp(int.Parse(maxPlayersField.text),2,15);
-        }
+        int maxPlayers = GameModeSelecter.Instance.SelectedGameMode.maxPlayers;
 
         try
         {
@@ -209,9 +210,17 @@ public class LobbyRelay : NetworkBehaviour
                         visibility: DataObject.VisibilityOptions.Public,
                         value: _hostData.JoinCode)
                 },
+                {
+                    "gameMode", new DataObject(
+                        visibility: DataObject.VisibilityOptions.Public,
+                        value: GameModeSelecter.Instance.SelectedGameMode.name)    
+                },
             };
 
-            var lobby = await Lobbies.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+            Lobby lobby = await Lobbies.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
+
+            localPlayerId = lobby.Players[0].Id;
+
 
             _lobbyId = lobby.Id;
 
@@ -252,6 +261,36 @@ public class LobbyRelay : NetworkBehaviour
             Lobbies.Instance.DeleteLobbyAsync(_lobbyId);
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        PlayerDisconnected_ServerRPC(localPlayerId);
+
+        NetworkManager.Singleton.Shutdown();
+    }
+
+
+    [ServerRpc(RequireOwnership = false)]
+    private void PlayerDisconnected_ServerRPC(string playerId)
+    {
+        RemovePlayerFromLobby(playerId);
+    }
+
+    public async void RemovePlayerFromLobby(string playerId)
+    {
+        try
+        {
+            await Lobbies.Instance.RemovePlayerAsync(_lobbyId, playerId);
+
+            print("player removed");
+        }
+        catch (LobbyServiceException e)
+        {
+            Debug.LogError($"Failed to remove player from lobby: {e}");
+        }
+    }
+
+
     public struct RelayHostData
     {
         public string JoinCode;

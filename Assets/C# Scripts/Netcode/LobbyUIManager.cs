@@ -1,32 +1,32 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Services.Lobbies.Models;
+using Unity.Mathematics;
 
 public class LobbyUIMananager : MonoBehaviour
 {
-    public LobbyUIPanel[] lobbyUISlots;
-    public int activeLobbyUISlots;
+    private LobbyUIPanel[] lobbyUISlots;
+
+
+
+    private void Start()
+    {
+        lobbyUISlots = GetComponentsInChildren<LobbyUIPanel>(true);
+    }
 
 
     public void CreateLobbyUI(List<Lobby> lobbies)
     {
-        for (int i = 0; i < activeLobbyUISlots; i++)
+        int toUpdatePanelCount = math.min(lobbies.Count, lobbyUISlots.Length);
+
+        for (int i = 0; i < toUpdatePanelCount; i++)
         {
-            lobbyUISlots[i].mainUI.SetActive(false);
+            lobbyUISlots[i].UpdatePanel(lobbies[i]);
         }
 
-        activeLobbyUISlots = lobbies.Count;
-        for (int i = 0; i < lobbies.Count; i++)
+        for (int i = toUpdatePanelCount; i > lobbyUISlots.Length; i++)
         {
-            lobbyUISlots[i].mainUI.SetActive(true);
-            lobbyUISlots[i].lobbyName.text = lobbies[i].Name;
-            lobbyUISlots[i].lobbyId = lobbies[i].Id;
-
-            int maxPlayers = lobbies[i].MaxPlayers;
-            bool full = lobbies[i].AvailableSlots == 0;
-
-            lobbyUISlots[i].amountOfPlayersInLobby.text = (maxPlayers - lobbies[i].AvailableSlots).ToString() + "/" + maxPlayers.ToString() + (full ? "Full!" : "");
-            lobbyUISlots[i].Full = full;
+            lobbyUISlots[i].Disable();
         }
     }
 }
