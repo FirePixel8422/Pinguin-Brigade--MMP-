@@ -49,6 +49,6 @@ public class LobbyUIPanel : MonoBehaviour
 
     public void JoinLobby()
     {
-        LobbyRelay.Instance.JoinLobbyById(lobbyId);
+        MatchMaker.Instance.JoinLobbyById(lobbyId);
     }
 }

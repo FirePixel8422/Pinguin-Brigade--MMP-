@@ -3,7 +3,7 @@
 
 
 [System.Serializable]
-public class GameMode
+public struct GameMode
 {
     public string name;
 

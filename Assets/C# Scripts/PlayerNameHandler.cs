@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+
 
 public class PlayerNameHandler : MonoBehaviour
 {
@@ -11,18 +9,18 @@ public class PlayerNameHandler : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
 
-
-
-    public TMP_InputField playerNameField;
-    public string playerName = "New Player";
-
-
-    private void Start()
-    {
         LoadPlayerName();
     }
+
+
+
+    [SerializeField] private GameObject selectNameUI;
+
+    [SerializeField] private TMP_InputField playerNameField;
+    public string PlayerName { get; private set; }
+
+
 
 
     public async void LoadPlayerName()
@@ -31,23 +29,24 @@ public class PlayerNameHandler : MonoBehaviour
 
         if (loadSucces)
         {
-            playerName = name.ToString();
-            playerNameField.text = playerName;
+            PlayerName = name.ToString();
+            playerNameField.text = name.ToString();
+        }
+        else
+        {
+            selectNameUI.SetActive(true);
 
-            string lobbyName = playerName.Length < 8 ? playerName : playerName[..4] + "...";
-
-            LobbyRelay.Instance.lobbyNameField.text = lobbyName + "'s Lobby";
+            playerNameField.Select();
         }
     }
 
-    public async void OnChangeName(string newName)
+    public void OnChangeName(string newName)
     {
-        playerName = newName;
+        PlayerName = newName;
+    }
 
-        string lobbyName = playerName.Length < 8 ? playerName : playerName[..4] + "...";
-
-        LobbyRelay.Instance.lobbyNameField.text = lobbyName + "'s Lobby";
-
-        await FileManager.SaveInfo(new FixedString32Bytes(newName), "PlayerName.json");
+    public async void SaveName()
+    {
+        await FileManager.SaveInfo(new FixedString32Bytes(PlayerName), "PlayerName");
     }
 }
